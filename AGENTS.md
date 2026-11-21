@@ -12,7 +12,7 @@ A command such as:
 dev-xcg blog-post
 ```
 
-generates five files in `src/module/blog-post/`:
+generates five files in `src/modules/blog-post/`:
 
 - `blog-post.interface.ts`
 - `blog-post.controller.ts`

@@ -48,7 +48,7 @@ describe("dev-xcg CLI", () => {
 
       equal(result.status, 0);
       match(result.stdout, /Resource name: user/);
-      match(result.stdout, /Created src\/module\/user\//);
+      match(result.stdout, /Created src\/modules\/user\//);
       match(result.stdout, /Creating user module/);
       match(result.stdout, /Created user\.route\.ts/);
       match(result.stdout, /Created user\.interface\.ts/);
@@ -61,7 +61,7 @@ describe("dev-xcg CLI", () => {
         match(result.stdout, new RegExp(filename.replaceAll(".", "\\.")));
       }
 
-      const resourceDirectory = join(projectRoot, "src", "module", "user");
+      const resourceDirectory = join(projectRoot, "src", "modules", "user");
       deepEqual((await readdir(resourceDirectory)).sort(), expectedFiles);
     });
   });
@@ -75,7 +75,7 @@ describe("dev-xcg CLI", () => {
       equal(second.status, 1);
       match(second.stderr, /resource directory already exists/i);
 
-      const resourceDirectory = join(projectRoot, "src", "module", "user");
+      const resourceDirectory = join(projectRoot, "src", "modules", "user");
       deepEqual((await readdir(resourceDirectory)).sort(), expectedFiles);
     });
   });

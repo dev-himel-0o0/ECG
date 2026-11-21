@@ -31,7 +31,7 @@ export type GenerationResult =
 
 interface GenerationPaths {
   readonly srcDirectory: string;
-  readonly moduleDirectory: string;
+  readonly modulesDirectory: string;
   readonly resourceDirectory: string;
   readonly files: readonly string[];
 }
@@ -119,10 +119,10 @@ async function preflight(paths: GenerationPaths): Promise<string | undefined> {
     return `${paths.srcDirectory} exists and is not a directory.`;
   }
 
-  const moduleStats = await statIfExists(paths.moduleDirectory);
+  const modulesStats = await statIfExists(paths.modulesDirectory);
 
-  if (moduleStats !== undefined && !moduleStats.isDirectory()) {
-    return `${paths.moduleDirectory} exists and is not a directory.`;
+  if (modulesStats !== undefined && !modulesStats.isDirectory()) {
+    return `${paths.modulesDirectory} exists and is not a directory.`;
   }
 
   if ((await lstatIfExists(paths.resourceDirectory)) !== undefined) {
@@ -174,12 +174,12 @@ export async function generateResource(
   const resourceDirectory = join(
     projectRoot,
     "src",
-    "module",
+    "modules",
     resource.directory,
   );
   const paths: GenerationPaths = {
     srcDirectory: join(projectRoot, "src"),
-    moduleDirectory: join(projectRoot, "src", "module"),
+    modulesDirectory: join(projectRoot, "src", "modules"),
     resourceDirectory,
     files: templates.map((template) =>
       join(resourceDirectory, template.filename),
@@ -200,8 +200,8 @@ export async function generateResource(
       createdDirectories.push(paths.srcDirectory);
     }
 
-    if (await createDirectory(paths.moduleDirectory)) {
-      createdDirectories.push(paths.moduleDirectory);
+    if (await createDirectory(paths.modulesDirectory)) {
+      createdDirectories.push(paths.modulesDirectory);
     }
 
     if (!(await createDirectory(paths.resourceDirectory))) {

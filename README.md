@@ -2,7 +2,7 @@
 
 **A lightweight CLI for scaffolding Express.js CRUD modules in TypeScript.**
 
-`dev-xcg` creates a complete, convention-based module under `src/module/<resource>/` so you can start implementing business logic instead of repeatedly creating the same files.
+`dev-xcg` creates a complete, convention-based module under `src/modules/<resource>/` so you can start implementing business logic instead of repeatedly creating the same files.
 
 [![npm version](https://img.shields.io/npm/v/dev-xcg.svg)](https://www.npmjs.com/package/dev-xcg)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
@@ -54,7 +54,7 @@ dev-xcg blog-post
 This creates:
 
 ```text
-src/module/blog-post/
+src/modules/blog-post/
 ├── blog-post.interface.ts
 ├── blog-post.controller.ts
 ├── blog-post.service.ts

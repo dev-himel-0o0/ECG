@@ -47,12 +47,13 @@ describe("generateResource", () => {
         return;
       }
 
-      const expectedDirectory = join(projectRoot, "src", "module", "user");
+      const expectedDirectory = join(projectRoot, "src", "modules", "user");
       equal(result.outputDirectory, expectedDirectory);
       deepEqual([...result.files].sort(), expectedFiles);
 
       const entries = await readdir(expectedDirectory);
       deepEqual(entries.sort(), expectedFiles);
+      deepEqual(await readdir(join(projectRoot, "src")), ["modules"]);
 
       equal(
         await readFile(join(expectedDirectory, "user.interface.ts"), "utf8"),
@@ -61,11 +62,11 @@ describe("generateResource", () => {
     });
   });
 
-  it("reuses an existing src/module directory", async () => {
+  it("reuses an existing src/modules directory", async () => {
     await withTempRoot(async (projectRoot) => {
-      const moduleDirectory = join(projectRoot, "src", "module");
-      await mkdir(moduleDirectory, { recursive: true });
-      await writeFile(join(moduleDirectory, "keep.txt"), "keep\n", "utf8");
+      const modulesDirectory = join(projectRoot, "src", "modules");
+      await mkdir(modulesDirectory, { recursive: true });
+      await writeFile(join(modulesDirectory, "keep.txt"), "keep\n", "utf8");
 
       const result = await generateResource({
         projectRoot,
@@ -77,14 +78,14 @@ describe("generateResource", () => {
         return;
       }
 
-      equal(await readFile(join(moduleDirectory, "keep.txt"), "utf8"), "keep\n");
+      equal(await readFile(join(modulesDirectory, "keep.txt"), "utf8"), "keep\n");
       deepEqual((await readdir(result.outputDirectory)).sort(), expectedFiles);
     });
   });
 
   it("rejects an existing resource directory and preserves its files", async () => {
     await withTempRoot(async (projectRoot) => {
-      const resourceDirectory = join(projectRoot, "src", "module", "user");
+      const resourceDirectory = join(projectRoot, "src", "modules", "user");
       await mkdir(resourceDirectory, { recursive: true });
       await writeFile(
         join(resourceDirectory, "user.interface.ts"),
