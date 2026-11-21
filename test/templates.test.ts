@@ -133,7 +133,8 @@ export const deleteById = async (id: string): Promise<void> => {
   it("renders the Express router with CRUD routes", () => {
     equal(
       contentOf(render("user"), "user.route.ts"),
-      `import { Router } from "express";
+      `import type { Router } from "express";
+import express from "express";
 
 import {
   createUser,
@@ -143,7 +144,7 @@ import {
   updateUser,
 } from "./user.controller.js";
 
-export const userRouter = Router();
+export const userRouter: Router = express.Router();
 
 userRouter.post("/", createUser);
 userRouter.get("/", getUsers);
@@ -210,6 +211,8 @@ userRouter.delete("/:id", deleteUser);
 
     const route = contentOf(files, "blog-post.route.ts");
     match(route, /from "\.\/blog-post\.controller\.js";/);
-    match(route, /export const blogPostRouter = Router\(\);/);
+    match(route, /import type \{ Router \} from "express";/);
+    match(route, /import express from "express";/);
+    match(route, /export const blogPostRouter: Router = express\.Router\(\);/);
   });
 });

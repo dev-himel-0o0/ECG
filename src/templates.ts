@@ -99,7 +99,8 @@ function renderRoute(resource: ResourceName): string {
   const collection = toPluralPascalCase(entity);
   const routerName = `${toCamelCase(entity)}Router`;
 
-  return `import { Router } from "express";
+  return `import type { Router } from "express";
+import express from "express";
 
 import {
   create${entity},
@@ -109,7 +110,7 @@ import {
   update${entity},
 } from "./${resource.filenamePrefix}.controller.js";
 
-export const ${routerName} = Router();
+export const ${routerName}: Router = express.Router();
 
 ${routerName}.post("/", create${entity});
 ${routerName}.get("/", get${collection});
