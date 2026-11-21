@@ -1,14 +1,16 @@
 {
   "name": "xcg",
   "version": "1.0.0",
-  "description": "Express CRUD Generator",
+  "description": "Express CRUD Generator - Generate TypeScript CRUD modules for Express.js applications with ease.",
   "type": "module",
   "main": "./dist/index.js",
   "bin": {
     "xcg": "./dist/index.js"
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md",
+    "LICENSE"
   ],
   "scripts": {
     "build": "tsc",
