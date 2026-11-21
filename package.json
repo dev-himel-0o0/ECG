@@ -1,6 +1,6 @@
 {
   "name": "dev-xcg",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Express CRUD Generator - Generate TypeScript CRUD modules for Express.js applications with ease.",
   "type": "module",
   "main": "./dist/index.js",
