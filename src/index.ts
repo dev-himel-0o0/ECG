@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { parseArguments } from "./arguments.js";
-import { parseResourceName } from "./naming.js";
+import { generateResource } from "./generator.js";
 
 const usage = `ECG - Express CRUD Generator
 
@@ -12,14 +12,18 @@ Resource names:
   Lowercase letters, numbers, and single hyphens
   Examples: user, blog-post`;
 
-function fail(message: string): void {
+function fail(message: string, includeUsage: boolean): void {
   console.error(message);
-  console.error();
-  console.error(usage);
+
+  if (includeUsage) {
+    console.error();
+    console.error(usage);
+  }
+
   process.exitCode = 1;
 }
 
-function main(argv: readonly string[]): void {
+async function main(argv: readonly string[]): Promise<void> {
   const parsed = parseArguments(argv);
 
   if (parsed.kind === "help") {
@@ -28,26 +32,33 @@ function main(argv: readonly string[]): void {
   }
 
   if (parsed.kind === "error") {
-    fail(parsed.message);
+    fail(parsed.message, true);
     return;
   }
 
-  const named = parseResourceName(parsed.resource);
+  const result = await generateResource({
+    projectRoot: process.cwd(),
+    resource: parsed.resource,
+  });
 
-  if (!named.ok) {
-    fail(named.message);
+  if (!result.ok) {
+    fail(result.message, false);
     return;
   }
 
-  const resource = named.value;
+  console.log(
+    `Generated module "${parsed.resource}" at ${result.outputDirectory}:`,
+  );
 
-  console.log(`Resource: ${resource.slug}`);
-  console.log(`Directory: ${resource.directory}`);
-  console.log(`Filename prefix: ${resource.filenamePrefix}`);
-  console.log(`PascalCase: ${resource.pascalCase}`);
-  console.log(`Function prefix: ${resource.functionPrefix}`);
-  console.log();
-  console.log("File generation is not implemented yet.");
+  for (const file of result.files) {
+    console.log(`  ${file}`);
+  }
 }
 
-main(process.argv.slice(2));
+try {
+  await main(process.argv.slice(2));
+} catch (error) {
+  const message = error instanceof Error ? error.message : String(error);
+  console.error(`Failed to generate module: ${message}`);
+  process.exitCode = 1;
+}
