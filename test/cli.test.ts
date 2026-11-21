@@ -47,7 +47,15 @@ describe("xcg CLI", () => {
       const result = runCli(projectRoot, ["user"]);
 
       equal(result.status, 0);
-      match(result.stdout, /Generated module "user"/);
+      match(result.stdout, /Resource name: user/);
+      match(result.stdout, /Created src\/module\/user\//);
+      match(result.stdout, /Creating user module/);
+      match(result.stdout, /Created user\.route\.ts/);
+      match(result.stdout, /Created user\.interface\.ts/);
+      match(result.stdout, /Created user\.controller\.ts/);
+      match(result.stdout, /Created user\.service\.ts/);
+      match(result.stdout, /Created user\.repository\.ts/);
+      match(result.stdout, /✨ user module generated successfully!/);
 
       for (const filename of expectedFiles) {
         match(result.stdout, new RegExp(filename.replaceAll(".", "\\.")));

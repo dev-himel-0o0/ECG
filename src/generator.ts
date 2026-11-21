@@ -15,6 +15,7 @@ export interface GenerateResourceOptions {
   readonly projectRoot: string;
   readonly resource: string;
   readonly fileWriter?: ExclusiveFileWriter;
+  readonly onFileStart?: (filename: string) => void;
 }
 
 export type GenerationResult =
@@ -213,6 +214,7 @@ export async function generateResource(
 
     for (const template of templates) {
       const filePath = join(paths.resourceDirectory, template.filename);
+      options.onFileStart?.(template.filename);
 
       try {
         await writeFileExclusive(filePath, template.content);

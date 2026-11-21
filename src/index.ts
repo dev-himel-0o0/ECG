@@ -2,6 +2,7 @@
 
 import { parseArguments } from "./arguments.js";
 import { generateResource } from "./generator.js";
+import { relative, sep } from "node:path";
 
 const usage = `xcg - Express CRUD Generator
 
@@ -36,23 +37,84 @@ async function main(argv: readonly string[]): Promise<void> {
     return;
   }
 
+  const projectRoot = process.cwd();
+  const spinnerFrames = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
+  let spinnerFrame = 0;
+  let spinnerTimer: ReturnType<typeof setInterval> | undefined;
+  let spinnerLabel = `Creating ${parsed.resource} module`;
+
+  const isInteractive = process.stdout.isTTY === true;
+
+  const renderSpinner = (): void => {
+    if (isInteractive) {
+      process.stdout.write(
+        `\r\x1b[2K${spinnerFrames[spinnerFrame]} ${spinnerLabel}`,
+      );
+      spinnerFrame = (spinnerFrame + 1) % spinnerFrames.length;
+    }
+  };
+
+  const stopSpinner = (): void => {
+    if (spinnerTimer !== undefined) {
+      clearInterval(spinnerTimer);
+      spinnerTimer = undefined;
+    }
+
+    if (isInteractive) {
+      process.stdout.write("\r\x1b[2K\x1b[?25h");
+    }
+  };
+
+  if (isInteractive) {
+    process.stdout.write("\x1b[?25l");
+    renderSpinner();
+    spinnerTimer = setInterval(renderSpinner, 80);
+  } else {
+    console.log(`◌ ${spinnerLabel}`);
+  }
+
   const result = await generateResource({
-    projectRoot: process.cwd(),
+    projectRoot,
     resource: parsed.resource,
+    onFileStart: (filename) => {
+      spinnerLabel = `Creating ${filename}`;
+
+      if (!isInteractive) {
+        console.log(`◌ ${spinnerLabel}`);
+      } else {
+        renderSpinner();
+      }
+    },
   });
+
+  stopSpinner();
 
   if (!result.ok) {
     fail(result.message, false);
     return;
   }
 
-  console.log(
-    `Generated module "${parsed.resource}" at ${result.outputDirectory}:`,
-  );
+  const outputDirectory = relative(projectRoot, result.outputDirectory)
+    .split(sep)
+    .join("/");
+  const filenamePrefix = parsed.resource;
+  const orderedFiles = [
+    `${filenamePrefix}.route.ts`,
+    `${filenamePrefix}.interface.ts`,
+    `${filenamePrefix}.controller.ts`,
+    `${filenamePrefix}.service.ts`,
+    `${filenamePrefix}.repository.ts`,
+  ];
 
-  for (const file of result.files) {
-    console.log(`  ${file}`);
+  console.log(`✔ Resource name: ${parsed.resource}`);
+  console.log(`✔ Created ${outputDirectory}/`);
+
+  for (const filename of orderedFiles) {
+    console.log(`✔ Created ${filename}`);
   }
+
+  console.log();
+  console.log(`✨ ${parsed.resource} module generated successfully!`);
 }
 
 try {
