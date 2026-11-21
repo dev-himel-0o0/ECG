@@ -13,27 +13,36 @@ function renderInterface(resource: ResourceName): string {
 function renderController(resource: ResourceName): string {
   const entity = resource.functionPrefix;
   const collection = toPluralPascalCase(entity);
+  const objectName = `${toCamelCase(entity)}Controller`;
 
-  return `import type { RequestHandler } from "express";
+  return `import type { Request, Response } from "express";
 
-export const create${entity}: RequestHandler = async (_req, _res) => {
+const create${entity} = async (_req: Request, _res: Response) => {
   throw new Error("Not implemented");
 };
 
-export const get${collection}: RequestHandler = async (_req, _res) => {
+const get${collection} = async (_req: Request, _res: Response) => {
   throw new Error("Not implemented");
 };
 
-export const get${entity}ById: RequestHandler = async (_req, _res) => {
+const get${entity}ById = async (_req: Request, _res: Response) => {
   throw new Error("Not implemented");
 };
 
-export const update${entity}: RequestHandler = async (_req, _res) => {
+const update${entity} = async (_req: Request, _res: Response) => {
   throw new Error("Not implemented");
 };
 
-export const delete${entity}: RequestHandler = async (_req, _res) => {
+const delete${entity} = async (_req: Request, _res: Response) => {
   throw new Error("Not implemented");
+};
+
+export const ${objectName} = {
+  create${entity},
+  get${collection},
+  get${entity}ById,
+  update${entity},
+  delete${entity},
 };
 `;
 }
@@ -42,54 +51,72 @@ function renderService(resource: ResourceName): string {
   const entity = resource.functionPrefix;
   const collection = toPluralPascalCase(entity);
   const interfaceName = `I${resource.pascalCase}`;
+  const objectName = `${toCamelCase(entity)}Service`;
 
   return `import type { ${interfaceName} } from "./${resource.filenamePrefix}.interface.js";
 
-export const create${entity} = async (payload: ${interfaceName}): Promise<${interfaceName}> => {
+const create${entity} = async (payload: ${interfaceName}) => {
   throw new Error("Not implemented");
 };
 
-export const get${collection} = async (): Promise<${interfaceName}[]> => {
+const get${collection} = async () => {
   throw new Error("Not implemented");
 };
 
-export const get${entity}ById = async (id: string): Promise<${interfaceName} | null> => {
+const get${entity}ById = async (id: string) => {
   throw new Error("Not implemented");
 };
 
-export const update${entity} = async (id: string, payload: ${interfaceName}): Promise<${interfaceName} | null> => {
+const update${entity} = async (id: string, payload: ${interfaceName}) => {
   throw new Error("Not implemented");
 };
 
-export const delete${entity} = async (id: string): Promise<void> => {
+const delete${entity} = async (id: string) => {
   throw new Error("Not implemented");
+};
+
+export const ${objectName} = {
+  create${entity},
+  get${collection},
+  get${entity}ById,
+  update${entity},
+  delete${entity},
 };
 `;
 }
 
 function renderRepository(resource: ResourceName): string {
   const interfaceName = `I${resource.pascalCase}`;
+  const objectName = `${toCamelCase(resource.functionPrefix)}Repository`;
 
   return `import type { ${interfaceName} } from "./${resource.filenamePrefix}.interface.js";
 
-export const create = async (payload: ${interfaceName}): Promise<${interfaceName}> => {
+const create = async (payload: ${interfaceName}) => {
   throw new Error("Not implemented");
 };
 
-export const findAll = async (): Promise<${interfaceName}[]> => {
+const findAll = async () => {
   throw new Error("Not implemented");
 };
 
-export const findById = async (id: string): Promise<${interfaceName} | null> => {
+const findById = async (id: string) => {
   throw new Error("Not implemented");
 };
 
-export const update = async (id: string, payload: ${interfaceName}): Promise<${interfaceName} | null> => {
+const update = async (id: string, payload: ${interfaceName}) => {
   throw new Error("Not implemented");
 };
 
-export const deleteById = async (id: string): Promise<void> => {
+const deleteById = async (id: string) => {
   throw new Error("Not implemented");
+};
+
+export const ${objectName} = {
+  create,
+  findAll,
+  findById,
+  update,
+  deleteById,
 };
 `;
 }
@@ -98,25 +125,19 @@ function renderRoute(resource: ResourceName): string {
   const entity = resource.functionPrefix;
   const collection = toPluralPascalCase(entity);
   const routerName = `${toCamelCase(entity)}Router`;
+  const controllerName = `${toCamelCase(entity)}Controller`;
 
   return `import type { Router } from "express";
 import express from "express";
-
-import {
-  create${entity},
-  delete${entity},
-  get${entity}ById,
-  get${collection},
-  update${entity},
-} from "./${resource.filenamePrefix}.controller.js";
+import { ${controllerName} } from "./${resource.filenamePrefix}.controller.js";
 
 export const ${routerName}: Router = express.Router();
 
-${routerName}.post("/", create${entity});
-${routerName}.get("/", get${collection});
-${routerName}.get("/:id", get${entity}ById);
-${routerName}.patch("/:id", update${entity});
-${routerName}.delete("/:id", delete${entity});
+${routerName}.post("/", ${controllerName}.create${entity});
+${routerName}.get("/", ${controllerName}.get${collection});
+${routerName}.get("/:id", ${controllerName}.get${entity}ById);
+${routerName}.patch("/:id", ${controllerName}.update${entity});
+${routerName}.delete("/:id", ${controllerName}.delete${entity});
 `;
 }
 

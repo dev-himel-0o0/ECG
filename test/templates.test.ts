@@ -49,26 +49,34 @@ describe("renderResourceTemplates", () => {
   it("renders typed controller handlers", () => {
     equal(
       contentOf(render("user"), "user.controller.ts"),
-      `import type { RequestHandler } from "express";
+      `import type { Request, Response } from "express";
 
-export const createUser: RequestHandler = async (_req, _res) => {
+const createUser = async (_req: Request, _res: Response) => {
   throw new Error("Not implemented");
 };
 
-export const getUsers: RequestHandler = async (_req, _res) => {
+const getUsers = async (_req: Request, _res: Response) => {
   throw new Error("Not implemented");
 };
 
-export const getUserById: RequestHandler = async (_req, _res) => {
+const getUserById = async (_req: Request, _res: Response) => {
   throw new Error("Not implemented");
 };
 
-export const updateUser: RequestHandler = async (_req, _res) => {
+const updateUser = async (_req: Request, _res: Response) => {
   throw new Error("Not implemented");
 };
 
-export const deleteUser: RequestHandler = async (_req, _res) => {
+const deleteUser = async (_req: Request, _res: Response) => {
   throw new Error("Not implemented");
+};
+
+export const userController = {
+  createUser,
+  getUsers,
+  getUserById,
+  updateUser,
+  deleteUser,
 };
 `,
     );
@@ -79,24 +87,32 @@ export const deleteUser: RequestHandler = async (_req, _res) => {
       contentOf(render("user"), "user.service.ts"),
       `import type { IUser } from "./user.interface.js";
 
-export const createUser = async (payload: IUser): Promise<IUser> => {
+const createUser = async (payload: IUser) => {
   throw new Error("Not implemented");
 };
 
-export const getUsers = async (): Promise<IUser[]> => {
+const getUsers = async () => {
   throw new Error("Not implemented");
 };
 
-export const getUserById = async (id: string): Promise<IUser | null> => {
+const getUserById = async (id: string) => {
   throw new Error("Not implemented");
 };
 
-export const updateUser = async (id: string, payload: IUser): Promise<IUser | null> => {
+const updateUser = async (id: string, payload: IUser) => {
   throw new Error("Not implemented");
 };
 
-export const deleteUser = async (id: string): Promise<void> => {
+const deleteUser = async (id: string) => {
   throw new Error("Not implemented");
+};
+
+export const userService = {
+  createUser,
+  getUsers,
+  getUserById,
+  updateUser,
+  deleteUser,
 };
 `,
     );
@@ -107,24 +123,32 @@ export const deleteUser = async (id: string): Promise<void> => {
       contentOf(render("user"), "user.repository.ts"),
       `import type { IUser } from "./user.interface.js";
 
-export const create = async (payload: IUser): Promise<IUser> => {
+const create = async (payload: IUser) => {
   throw new Error("Not implemented");
 };
 
-export const findAll = async (): Promise<IUser[]> => {
+const findAll = async () => {
   throw new Error("Not implemented");
 };
 
-export const findById = async (id: string): Promise<IUser | null> => {
+const findById = async (id: string) => {
   throw new Error("Not implemented");
 };
 
-export const update = async (id: string, payload: IUser): Promise<IUser | null> => {
+const update = async (id: string, payload: IUser) => {
   throw new Error("Not implemented");
 };
 
-export const deleteById = async (id: string): Promise<void> => {
+const deleteById = async (id: string) => {
   throw new Error("Not implemented");
+};
+
+export const userRepository = {
+  create,
+  findAll,
+  findById,
+  update,
+  deleteById,
 };
 `,
     );
@@ -135,22 +159,15 @@ export const deleteById = async (id: string): Promise<void> => {
       contentOf(render("user"), "user.route.ts"),
       `import type { Router } from "express";
 import express from "express";
-
-import {
-  createUser,
-  deleteUser,
-  getUserById,
-  getUsers,
-  updateUser,
-} from "./user.controller.js";
+import { userController } from "./user.controller.js";
 
 export const userRouter: Router = express.Router();
 
-userRouter.post("/", createUser);
-userRouter.get("/", getUsers);
-userRouter.get("/:id", getUserById);
-userRouter.patch("/:id", updateUser);
-userRouter.delete("/:id", deleteUser);
+userRouter.post("/", userController.createUser);
+userRouter.get("/", userController.getUsers);
+userRouter.get("/:id", userController.getUserById);
+userRouter.patch("/:id", userController.updateUser);
+userRouter.delete("/:id", userController.deleteUser);
 `,
     );
   });
@@ -196,23 +213,26 @@ userRouter.delete("/:id", deleteUser);
     );
 
     const controller = contentOf(files, "blog-post.controller.ts");
-    match(controller, /export const createBlogPost: RequestHandler/);
-    match(controller, /export const getBlogPosts: RequestHandler/);
-    match(controller, /export const getBlogPostById: RequestHandler/);
-    match(controller, /export const updateBlogPost: RequestHandler/);
-    match(controller, /export const deleteBlogPost: RequestHandler/);
+    match(controller, /import type \{ Request, Response \} from "express";/);
+    match(controller, /const createBlogPost = async \(_req: Request, _res: Response\)/);
+    match(controller, /export const blogPostController = \{/);
 
     const service = contentOf(files, "blog-post.service.ts");
     match(service, /import type \{ IBlogPost \} from "\.\/blog-post\.interface\.js";/);
-    match(service, /export const getBlogPosts = async \(\): Promise<IBlogPost\[\]>/);
+    match(service, /const getBlogPosts = async \(\)/);
+    match(service, /export const blogPostService = \{/);
+    equal(service.includes("Promise"), false);
 
     const repository = contentOf(files, "blog-post.repository.ts");
-    match(repository, /export const findAll = async \(\): Promise<IBlogPost\[\]>/);
+    match(repository, /const findAll = async \(\)/);
+    match(repository, /export const blogPostRepository = \{/);
+    equal(repository.includes("Promise"), false);
 
     const route = contentOf(files, "blog-post.route.ts");
-    match(route, /from "\.\/blog-post\.controller\.js";/);
+    match(route, /import \{ blogPostController \} from "\.\/blog-post\.controller\.js";/);
     match(route, /import type \{ Router \} from "express";/);
     match(route, /import express from "express";/);
     match(route, /export const blogPostRouter: Router = express\.Router\(\);/);
+    match(route, /blogPostRouter\.post\("\/", blogPostController\.createBlogPost\);/);
   });
 });
