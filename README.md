@@ -5,7 +5,7 @@
 `dev-xcg` creates a complete, convention-based module under `src/module/<resource>/` so you can start implementing business logic instead of repeatedly creating the same files.
 
 [![npm version](https://img.shields.io/npm/v/dev-xcg.svg)](https://www.npmjs.com/package/dev-xcg)
-[![license](https://img.shields.io/npm/l/dev-xcg.svg)](https://www.npmjs.com/package/dev-xcg)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ## Features
 
