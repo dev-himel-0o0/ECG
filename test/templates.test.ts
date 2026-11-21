@@ -51,25 +51,15 @@ describe("renderResourceTemplates", () => {
       contentOf(render("user"), "user.controller.ts"),
       `import type { Request, Response } from "express";
 
-const createUser = async (_req: Request, _res: Response) => {
-  throw new Error("Not implemented");
-};
+const createUser = async (req: Request, res: Response) => {};
 
-const getUsers = async (_req: Request, _res: Response) => {
-  throw new Error("Not implemented");
-};
+const getUsers = async (req: Request, res: Response) => {};
 
-const getUserById = async (_req: Request, _res: Response) => {
-  throw new Error("Not implemented");
-};
+const getUserById = async (req: Request, res: Response) => {};
 
-const updateUser = async (_req: Request, _res: Response) => {
-  throw new Error("Not implemented");
-};
+const updateUser = async (req: Request, res: Response) => {};
 
-const deleteUser = async (_req: Request, _res: Response) => {
-  throw new Error("Not implemented");
-};
+const deleteUser = async (req: Request, res: Response) => {};
 
 export const userController = {
   createUser,
@@ -87,25 +77,15 @@ export const userController = {
       contentOf(render("user"), "user.service.ts"),
       `import type { IUser } from "./user.interface.js";
 
-const createUser = async (payload: IUser) => {
-  throw new Error("Not implemented");
-};
+const createUser = async (payload: IUser) => {};
 
-const getUsers = async () => {
-  throw new Error("Not implemented");
-};
+const getUsers = async () => {};
 
-const getUserById = async (id: string) => {
-  throw new Error("Not implemented");
-};
+const getUserById = async (id: string) => {};
 
-const updateUser = async (id: string, payload: IUser) => {
-  throw new Error("Not implemented");
-};
+const updateUser = async (id: string, payload: IUser) => {};
 
-const deleteUser = async (id: string) => {
-  throw new Error("Not implemented");
-};
+const deleteUser = async (id: string) => {};
 
 export const userService = {
   createUser,
@@ -123,25 +103,15 @@ export const userService = {
       contentOf(render("user"), "user.repository.ts"),
       `import type { IUser } from "./user.interface.js";
 
-const create = async (payload: IUser) => {
-  throw new Error("Not implemented");
-};
+const create = async (payload: IUser) => {};
 
-const findAll = async () => {
-  throw new Error("Not implemented");
-};
+const findAll = async () => {};
 
-const findById = async (id: string) => {
-  throw new Error("Not implemented");
-};
+const findById = async (id: string) => {};
 
-const update = async (id: string, payload: IUser) => {
-  throw new Error("Not implemented");
-};
+const update = async (id: string, payload: IUser) => {};
 
-const deleteById = async (id: string) => {
-  throw new Error("Not implemented");
-};
+const deleteById = async (id: string) => {};
 
 export const userRepository = {
   create,
@@ -172,7 +142,7 @@ userRouter.delete("/:id", userController.deleteUser);
     );
   });
 
-  it("uses only Not implemented bodies in controller, service, and repository", () => {
+  it("renders empty controller, service, and repository functions", () => {
     const files = render("user");
 
     for (const filename of [
@@ -181,7 +151,8 @@ userRouter.delete("/:id", userController.deleteUser);
       "user.repository.ts",
     ]) {
       const content = contentOf(files, filename);
-      equal(content.split(`throw new Error("Not implemented");`).length - 1, 5);
+      equal(content.includes("Not implemented"), false);
+      equal(content.includes("throw new Error"), false);
     }
   });
 
@@ -214,7 +185,7 @@ userRouter.delete("/:id", userController.deleteUser);
 
     const controller = contentOf(files, "blog-post.controller.ts");
     match(controller, /import type \{ Request, Response \} from "express";/);
-    match(controller, /const createBlogPost = async \(_req: Request, _res: Response\)/);
+    match(controller, /const createBlogPost = async \(req: Request, res: Response\) => \{\}/);
     match(controller, /export const blogPostController = \{/);
 
     const service = contentOf(files, "blog-post.service.ts");

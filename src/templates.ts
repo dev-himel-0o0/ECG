@@ -17,25 +17,15 @@ function renderController(resource: ResourceName): string {
 
   return `import type { Request, Response } from "express";
 
-const create${entity} = async (_req: Request, _res: Response) => {
-  throw new Error("Not implemented");
-};
+const create${entity} = async (req: Request, res: Response) => {};
 
-const get${collection} = async (_req: Request, _res: Response) => {
-  throw new Error("Not implemented");
-};
+const get${collection} = async (req: Request, res: Response) => {};
 
-const get${entity}ById = async (_req: Request, _res: Response) => {
-  throw new Error("Not implemented");
-};
+const get${entity}ById = async (req: Request, res: Response) => {};
 
-const update${entity} = async (_req: Request, _res: Response) => {
-  throw new Error("Not implemented");
-};
+const update${entity} = async (req: Request, res: Response) => {};
 
-const delete${entity} = async (_req: Request, _res: Response) => {
-  throw new Error("Not implemented");
-};
+const delete${entity} = async (req: Request, res: Response) => {};
 
 export const ${objectName} = {
   create${entity},
@@ -55,25 +45,15 @@ function renderService(resource: ResourceName): string {
 
   return `import type { ${interfaceName} } from "./${resource.filenamePrefix}.interface.js";
 
-const create${entity} = async (payload: ${interfaceName}) => {
-  throw new Error("Not implemented");
-};
+const create${entity} = async (payload: ${interfaceName}) => {};
 
-const get${collection} = async () => {
-  throw new Error("Not implemented");
-};
+const get${collection} = async () => {};
 
-const get${entity}ById = async (id: string) => {
-  throw new Error("Not implemented");
-};
+const get${entity}ById = async (id: string) => {};
 
-const update${entity} = async (id: string, payload: ${interfaceName}) => {
-  throw new Error("Not implemented");
-};
+const update${entity} = async (id: string, payload: ${interfaceName}) => {};
 
-const delete${entity} = async (id: string) => {
-  throw new Error("Not implemented");
-};
+const delete${entity} = async (id: string) => {};
 
 export const ${objectName} = {
   create${entity},
@@ -91,25 +71,15 @@ function renderRepository(resource: ResourceName): string {
 
   return `import type { ${interfaceName} } from "./${resource.filenamePrefix}.interface.js";
 
-const create = async (payload: ${interfaceName}) => {
-  throw new Error("Not implemented");
-};
+const create = async (payload: ${interfaceName}) => {};
 
-const findAll = async () => {
-  throw new Error("Not implemented");
-};
+const findAll = async () => {};
 
-const findById = async (id: string) => {
-  throw new Error("Not implemented");
-};
+const findById = async (id: string) => {};
 
-const update = async (id: string, payload: ${interfaceName}) => {
-  throw new Error("Not implemented");
-};
+const update = async (id: string, payload: ${interfaceName}) => {};
 
-const deleteById = async (id: string) => {
-  throw new Error("Not implemented");
-};
+const deleteById = async (id: string) => {};
 
 export const ${objectName} = {
   create,
