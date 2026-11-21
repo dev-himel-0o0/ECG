@@ -41,7 +41,7 @@ function runCli(projectRoot: string, args: readonly string[]) {
   return result;
 }
 
-describe("ecg CLI", () => {
+describe("xcg CLI", () => {
   it("generates a module relative to the current working directory", async () => {
     await withTempRoot(async (projectRoot) => {
       const result = runCli(projectRoot, ["user"]);

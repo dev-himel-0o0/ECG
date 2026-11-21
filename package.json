@@ -1,11 +1,11 @@
 {
-  "name": "ecg",
+  "name": "xcg",
   "version": "1.0.0",
   "description": "Express CRUD Generator",
   "type": "module",
   "main": "./dist/index.js",
   "bin": {
-    "ecg": "./dist/index.js"
+    "xcg": "./dist/index.js"
   },
   "files": [
     "dist"
@@ -29,7 +29,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dev-himel-0o0/ECG.git"
+    "url": "git+https://github.com/dev-himel-0o0/xcg.git"
   },
   "license": "MIT",
   "devDependencies": {

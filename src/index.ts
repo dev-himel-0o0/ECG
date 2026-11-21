@@ -3,10 +3,10 @@
 import { parseArguments } from "./arguments.js";
 import { generateResource } from "./generator.js";
 
-const usage = `ECG - Express CRUD Generator
+const usage = `xcg - Express CRUD Generator
 
 Usage:
-  ecg <resource>
+  xcg <resource>
 
 Resource names:
   Lowercase letters, numbers, and single hyphens
