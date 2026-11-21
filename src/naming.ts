@@ -36,6 +36,22 @@ function capitalize(value: string): string {
   return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
+export function toCamelCase(value: string): string {
+  return value.charAt(0).toLowerCase() + value.slice(1);
+}
+
+export function toPluralPascalCase(value: string): string {
+  if (/[^aeiou]y$/i.test(value)) {
+    return `${value.slice(0, -1)}ies`;
+  }
+
+  if (/(?:s|x|z|ch|sh)$/i.test(value)) {
+    return `${value}es`;
+  }
+
+  return `${value}s`;
+}
+
 export function parseResourceName(input: string): ResourceNameResult {
   if (!RESOURCE_NAME_PATTERN.test(input)) {
     return { ok: false, message: invalidResourceNameMessage(input) };

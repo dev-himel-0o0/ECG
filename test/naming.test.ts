@@ -1,7 +1,11 @@
 import { describe, it } from "node:test";
 import { deepEqual, equal, match } from "node:assert/strict";
 
-import { parseResourceName } from "../src/naming.js";
+import {
+  parseResourceName,
+  toCamelCase,
+  toPluralPascalCase,
+} from "../src/naming.js";
 
 describe("parseResourceName", () => {
   it("converts a lowercase identifier", () => {
@@ -86,5 +90,25 @@ describe("parseResourceName", () => {
     if (!result.ok) {
       match(result.message, /path separators|traversal/i);
     }
+  });
+});
+
+describe("toCamelCase", () => {
+  it("lowercases the first character", () => {
+    equal(toCamelCase("User"), "user");
+    equal(toCamelCase("BlogPost"), "blogPost");
+  });
+});
+
+describe("toPluralPascalCase", () => {
+  it("pluralizes regular and kebab-derived names", () => {
+    equal(toPluralPascalCase("User"), "Users");
+    equal(toPluralPascalCase("BlogPost"), "BlogPosts");
+  });
+
+  it("handles common plural endings", () => {
+    equal(toPluralPascalCase("Category"), "Categories");
+    equal(toPluralPascalCase("Box"), "Boxes");
+    equal(toPluralPascalCase("Status"), "Statuses");
   });
 });
