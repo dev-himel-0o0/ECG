@@ -1,11 +1,11 @@
 {
-  "name": "xcg",
+  "name": "dev-xcg",
   "version": "1.0.0",
   "description": "Express CRUD Generator - Generate TypeScript CRUD modules for Express.js applications with ease.",
   "type": "module",
   "main": "./dist/index.js",
   "bin": {
-    "xcg": "./dist/index.js"
+    "dev-xcg": "dist/index.js"
   },
   "files": [
     "dist",
@@ -31,7 +31,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dev-himel-0o0/xcg.git"
+    "url": "git+https://github.com/dev-himel-0o0/dev-xcg.git"
   },
   "license": "MIT",
   "devDependencies": {

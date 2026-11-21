@@ -1,11 +1,11 @@
-# xcg
+# dev-xcg
 
 **A lightweight CLI for scaffolding Express.js CRUD modules in TypeScript.**
 
-`xcg` creates a complete, convention-based module under `src/module/<resource>/` so you can start implementing business logic instead of repeatedly creating the same files.
+`dev-xcg` creates a complete, convention-based module under `src/module/<resource>/` so you can start implementing business logic instead of repeatedly creating the same files.
 
-[![npm version](https://img.shields.io/npm/v/xcg.svg)](https://www.npmjs.com/package/xcg)
-[![license](https://img.shields.io/npm/l/xcg.svg)](https://www.npmjs.com/package/xcg)
+[![npm version](https://img.shields.io/npm/v/dev-xcg.svg)](https://www.npmjs.com/package/dev-xcg)
+[![license](https://img.shields.io/npm/l/dev-xcg.svg)](https://www.npmjs.com/package/dev-xcg)
 
 ## Features
 
@@ -25,22 +25,22 @@
 
 ## Installation
 
-Run `xcg` once with `npx`:
+Run `dev-xcg` once with `npx`:
 
 ```bash
-npx xcg <resource>
+npx dev-xcg <resource>
 ```
 
 Or install it globally:
 
 ```bash
-npm install --global xcg
+npm install --global dev-xcg
 ```
 
 You can also add it as a development dependency:
 
 ```bash
-npm install --save-dev xcg
+npm install --save-dev dev-xcg
 ```
 
 ## Usage
@@ -48,7 +48,7 @@ npm install --save-dev xcg
 Run the CLI from the root of the project where CRUD modules should be generated:
 
 ```bash
-xcg blog-post
+dev-xcg blog-post
 ```
 
 This creates:
@@ -65,14 +65,14 @@ src/module/blog-post/
 Display CLI help with:
 
 ```bash
-xcg --help
+dev-xcg --help
 # or
-xcg -h
+dev-xcg -h
 ```
 
 ## Generated Module
 
-For `blog-post`, `xcg` creates the following interface, functions, and routes:
+For `blog-post`, `dev-xcg` creates the following interface, functions, and routes:
 
 | Layer | Exports |
 |-------|---------|
@@ -109,7 +109,7 @@ Names must also satisfy these constraints:
 
 ## Safe Generation
 
-`xcg` is intentionally conservative:
+`dev-xcg` is intentionally conservative:
 
 - A resource directory is created only after validation and preflight checks
 - Existing modules and files are never overwritten
@@ -121,8 +121,8 @@ Names must also satisfy these constraints:
 Clone the repository and install dependencies:
 
 ```bash
-git clone https://github.com/dev-himel-0o0/xcg.git
-cd xcg
+git clone https://github.com/dev-himel-0o0/dev-xcg.git
+cd dev-xcg
 npm install
 ```
 

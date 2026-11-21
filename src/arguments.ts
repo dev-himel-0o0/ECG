@@ -20,7 +20,7 @@ export function parseArguments(argv: readonly string[]): ParsedArguments {
   if (resource === undefined) {
     return {
       kind: "error",
-      message: "Missing resource name. Usage: xcg <resource>",
+      message: "Missing resource name. Usage: dev-xcg <resource>",
     };
   }
 

@@ -4,10 +4,10 @@ import { parseArguments } from "./arguments.js";
 import { generateResource } from "./generator.js";
 import { relative, sep } from "node:path";
 
-const usage = `xcg - Express CRUD Generator
+const usage = `dev-xcg - Express CRUD Generator
 
 Usage:
-  xcg <resource>
+  dev-xcg <resource>
 
 Resource names:
   Lowercase letters, numbers, and single hyphens

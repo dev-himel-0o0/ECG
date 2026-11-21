@@ -1,15 +1,15 @@
-# xcg — Express CRUD Generator
+# dev-xcg — Express CRUD Generator
 
 This file provides repository-specific guidance for contributors and AI coding assistants.
 
 ## Project Purpose
 
-`xcg` is a Node.js CLI that generates TypeScript Express CRUD modules.
+`dev-xcg` is a Node.js CLI that generates TypeScript Express CRUD modules.
 
 A command such as:
 
 ```bash
-xcg blog-post
+dev-xcg blog-post
 ```
 
 generates five files in `src/module/blog-post/`:
@@ -128,11 +128,11 @@ Relevant test areas:
 
 The package metadata is in `package.json`:
 
-- Package name: `xcg`
-- CLI binary: `xcg` -> `./dist/index.js`
-- Published files: `dist` only
+- Package name: `dev-xcg`
+- CLI binary: `dev-xcg` -> `./dist/index.js`
+- Published files: `dist`, `README.md`, and `LICENSE`
 - License: MIT
-- Repository: `dev-himel-0o0/xcg`
+- Repository: `dev-himel-0o0/dev-xcg`
 
 Publishing is manual. Do not add a publish step to CI without an explicit security and release process.
 
