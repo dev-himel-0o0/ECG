@@ -10,7 +10,7 @@
 ## Features
 
 - Generates five TypeScript files with matching names and imports
-- Supports an Express 5-style `RequestHandler` controller
+- Generates typed Express controller, service, and repository objects
 - Uses relative Express router paths
 - Produces consistent CRUD naming and service/repository contracts
 - Validates resource names before writing files
@@ -77,10 +77,10 @@ For `blog-post`, `xcg` creates the following interface, functions, and routes:
 | Layer | Exports |
 |-------|---------|
 | Interface | `IBlogPost` |
-| Controller | `createBlogPost`, `getBlogPosts`, `getBlogPostById`, `updateBlogPost`, `deleteBlogPost` |
-| Service | `createBlogPost`, `getBlogPosts`, `getBlogPostById`, `updateBlogPost`, `deleteBlogPost` |
-| Repository | `create`, `findAll`, `findById`, `update`, `deleteById` |
-| Route | `Router` instance exported as `blogPostRouter` |
+| Controller | `blogPostController` with `createBlogPost`, `getBlogPosts`, `getBlogPostById`, `updateBlogPost`, `deleteBlogPost` |
+| Service | `blogPostService` with `createBlogPost`, `getBlogPosts`, `getBlogPostById`, `updateBlogPost`, `deleteBlogPost` |
+| Repository | `blogPostRepository` with `create`, `findAll`, `findById`, `update`, `deleteById` |
+| Route | Typed `Router` instance exported as `blogPostRouter` |
 
 The generated router declares these relative paths:
 
@@ -92,7 +92,7 @@ The generated router declares these relative paths:
 | `PATCH` | `/:id` | `updateBlogPost` |
 | `DELETE` | `/:id` | `deleteBlogPost` |
 
-The generated service, repository, and controller methods are implementation stubs. Replace each `Not implemented` error with the appropriate application logic.
+The generated service, repository, and controller methods are empty implementation stubs. Add the appropriate application logic as needed.
 
 ## Resource Name Rules
 
