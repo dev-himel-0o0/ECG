@@ -40,8 +40,8 @@ test("generated templates type-check with Express in strict mode", async () => {
         {
           compilerOptions: {
             target: "ES2022",
-            module: "NodeNext",
-            moduleResolution: "NodeNext",
+            module: "ESNext",
+            moduleResolution: "Bundler",
             strict: true,
             noEmit: true,
             noUnusedLocals: true,

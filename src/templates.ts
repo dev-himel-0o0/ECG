@@ -43,7 +43,7 @@ function renderService(resource: ResourceName): string {
   const interfaceName = `I${resource.pascalCase}`;
   const objectName = `${toCamelCase(entity)}Service`;
 
-  return `import type { ${interfaceName} } from "./${resource.filenamePrefix}.interface.js";
+  return `import type { ${interfaceName} } from "./${resource.filenamePrefix}.interface";
 
 const create${entity} = async (payload: ${interfaceName}) => {};
 
@@ -69,7 +69,7 @@ function renderRepository(resource: ResourceName): string {
   const interfaceName = `I${resource.pascalCase}`;
   const objectName = `${toCamelCase(resource.functionPrefix)}Repository`;
 
-  return `import type { ${interfaceName} } from "./${resource.filenamePrefix}.interface.js";
+  return `import type { ${interfaceName} } from "./${resource.filenamePrefix}.interface";
 
 const create = async (payload: ${interfaceName}) => {};
 
@@ -99,7 +99,7 @@ function renderRoute(resource: ResourceName): string {
 
   return `import type { Router } from "express";
 import express from "express";
-import { ${controllerName} } from "./${resource.filenamePrefix}.controller.js";
+import { ${controllerName} } from "./${resource.filenamePrefix}.controller";
 
 export const ${routerName}: Router = express.Router();
 

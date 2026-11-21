@@ -75,7 +75,7 @@ export const userController = {
   it("renders typed service functions", () => {
     equal(
       contentOf(render("user"), "user.service.ts"),
-      `import type { IUser } from "./user.interface.js";
+      `import type { IUser } from "./user.interface";
 
 const createUser = async (payload: IUser) => {};
 
@@ -101,7 +101,7 @@ export const userService = {
   it("renders typed repository functions", () => {
     equal(
       contentOf(render("user"), "user.repository.ts"),
-      `import type { IUser } from "./user.interface.js";
+      `import type { IUser } from "./user.interface";
 
 const create = async (payload: IUser) => {};
 
@@ -129,7 +129,7 @@ export const userRepository = {
       contentOf(render("user"), "user.route.ts"),
       `import type { Router } from "express";
 import express from "express";
-import { userController } from "./user.controller.js";
+import { userController } from "./user.controller";
 
 export const userRouter: Router = express.Router();
 
@@ -189,7 +189,7 @@ userRouter.delete("/:id", userController.deleteUser);
     match(controller, /export const blogPostController = \{/);
 
     const service = contentOf(files, "blog-post.service.ts");
-    match(service, /import type \{ IBlogPost \} from "\.\/blog-post\.interface\.js";/);
+    match(service, /import type \{ IBlogPost \} from "\.\/blog-post\.interface";/);
     match(service, /const getBlogPosts = async \(\)/);
     match(service, /export const blogPostService = \{/);
     equal(service.includes("Promise"), false);
@@ -200,7 +200,7 @@ userRouter.delete("/:id", userController.deleteUser);
     equal(repository.includes("Promise"), false);
 
     const route = contentOf(files, "blog-post.route.ts");
-    match(route, /import \{ blogPostController \} from "\.\/blog-post\.controller\.js";/);
+    match(route, /import \{ blogPostController \} from "\.\/blog-post\.controller";/);
     match(route, /import type \{ Router \} from "express";/);
     match(route, /import express from "express";/);
     match(route, /export const blogPostRouter: Router = express\.Router\(\);/);
