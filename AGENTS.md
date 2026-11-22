@@ -123,6 +123,7 @@ Relevant test areas:
 - `test/templates-typecheck.test.ts`: compilation of generated Express TypeScript
 - `test/generator.test.ts`: filesystem safety and cleanup
 - `test/cli.test.ts`: process exit codes and CLI integration
+- `test/version.test.ts`: package and lockfile version consistency
 
 ## Package and Publishing
 
@@ -138,12 +139,17 @@ Publishing is manual. Do not add a publish step to CI without an explicit securi
 
 Before publishing:
 
-1. Start from a clean branch with the intended version committed.
+1. Start from a clean branch with the intended version committed in `package.json` and `package-lock.json`.
 2. Run `npm run typecheck`.
 3. Run `npm test`.
 4. Run `npm run build`.
 5. Run `npm pack` and inspect the tarball contents.
 6. Verify the CLI from the packed artifact if needed.
 7. Publish with `npm publish`.
+8. Create and push an annotated tag for the published version:
+   ```bash
+   git tag -a v<version> -m "dev-xcg <version>"
+   git push origin v<version>
+   ```
 
 Do not document or implement `--dry-run` or automated publishing unless the release process is intentionally changed.
