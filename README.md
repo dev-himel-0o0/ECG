@@ -74,23 +74,23 @@ dev-xcg -h
 
 For `blog-post`, `dev-xcg` creates the following interface, functions, and routes:
 
-| Layer | Exports |
-|-------|---------|
-| Interface | `IBlogPost` |
+| Layer      | Exports                                                                                                           |
+| ---------- | ----------------------------------------------------------------------------------------------------------------- |
+| Interface  | `IBlogPost`                                                                                                       |
 | Controller | `blogPostController` with `createBlogPost`, `getBlogPosts`, `getBlogPostById`, `updateBlogPost`, `deleteBlogPost` |
-| Service | `blogPostService` with `createBlogPost`, `getBlogPosts`, `getBlogPostById`, `updateBlogPost`, `deleteBlogPost` |
-| Repository | `blogPostRepository` with `create`, `findAll`, `findById`, `update`, `deleteById` |
-| Route | Typed `Router` instance exported as `blogPostRouter` |
+| Service    | `blogPostService` with `createBlogPost`, `getBlogPosts`, `getBlogPostById`, `updateBlogPost`, `deleteBlogPost`    |
+| Repository | `blogPostRepository` with `create`, `findAll`, `findById`, `update`, `deleteById`                                 |
+| Route      | Typed `Router` instance exported as `blogPostRouter`                                                              |
 
 The generated router declares these relative paths:
 
-| Method | Path | Controller |
-|--------|------|------------|
-| `POST` | `/` | `createBlogPost` |
-| `GET` | `/` | `getBlogPosts` |
-| `GET` | `/:id` | `getBlogPostById` |
-| `PATCH` | `/:id` | `updateBlogPost` |
-| `DELETE` | `/:id` | `deleteBlogPost` |
+| Method   | Path   | Controller        |
+| -------- | ------ | ----------------- |
+| `POST`   | `/`    | `createBlogPost`  |
+| `GET`    | `/`    | `getBlogPosts`    |
+| `GET`    | `/:id` | `getBlogPostById` |
+| `PATCH`  | `/:id` | `updateBlogPost`  |
+| `DELETE` | `/:id` | `deleteBlogPost`  |
 
 The generated service, repository, and controller methods are empty implementation stubs. Add the appropriate application logic as needed.
 
@@ -115,65 +115,6 @@ Names must also satisfy these constraints:
 - Existing modules and files are never overwritten
 - Files are written exclusively with the `wx` flag
 - Directories and files created during a failed generation are removed
-
-## Development
-
-Clone the repository and install dependencies:
-
-```bash
-git clone https://github.com/dev-himel-0o0/dev-xcg.git
-cd dev-xcg
-npm install
-```
-
-Build the CLI:
-
-```bash
-npm run build
-```
-
-Run the strict typecheck:
-
-```bash
-npm run typecheck
-```
-
-Build and run the test suite:
-
-```bash
-npm test
-```
-
-The tests cover argument parsing, resource naming, template rendering, filesystem generation, CLI integration, and generated TypeScript code.
-
-Run one compiled test suite directly when useful:
-
-```bash
-node --test dist-test/test/naming.test.js
-```
-
-## Publishing
-
-Publishing is manual and should be performed from a clean `main` branch.
-
-1. Update the package version in `package.json`.
-2. Build and validate the package:
-
-   ```bash
-   npm run typecheck
-   npm test
-   npm run build
-   npm pack
-   ```
-
-3. Inspect the generated `.tgz` contents and test the packed CLI if necessary.
-4. Publish with:
-
-   ```bash
-   npm publish
-   ```
-
-The npm package contains the compiled `dist/` directory. The package has no runtime dependencies and requires Node.js 20 or newer.
 
 ## Contributing
 
