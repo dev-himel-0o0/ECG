@@ -64,14 +64,14 @@ node --test dist-test/test/naming.test.js
 
 ## Naming and Output Conventions
 
-- Resource names are lowercase kebab-case: `user`, `blog-post`, `product-review`
+- Resource names are lowercase kebab-case: `user`, `blog-post`, `product2`, `product-review`
 - The resource directory and filename prefix use the same slug
 - PascalCase resource names are computed from the slug: `blog-post` becomes `BlogPost`
 - Controller and service CRUD names use `createX`, `getXs`, `getXById`, `updateX`, and `deleteX`
 - Repository exports use `create`, `findAll`, `findById`, `update`, and `deleteById`
 - Routes are relative to the mounted router: `POST /`, `GET /`, `GET /:id`, `PATCH /:id`, and `DELETE /:id`
 - Generated Express imports use NodeNext-compatible `.js` suffixes
-- Generated service and repository methods start as typed `Not implemented` stubs
+- Generated controller, service, and repository methods start as empty async implementation stubs
 
 ## Validation Rules
 
