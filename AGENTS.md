@@ -135,6 +135,8 @@ The package metadata is in `package.json`:
 - License: MIT
 - Repository: `dev-himel-0o0/dev-xcg`
 
+Document usage with `npx dev-xcg`. Do not recommend installing the package globally or adding it as a project dependency.
+
 Publishing is manual. Do not add a publish step to CI without an explicit security and release process.
 
 Before publishing:

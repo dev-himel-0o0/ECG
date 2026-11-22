@@ -23,32 +23,14 @@
 - Node.js 20 or newer
 - An Express + TypeScript project
 
-## Installation
-
-Run `dev-xcg` once with `npx`:
-
-```bash
-npx dev-xcg <resource>
-```
-
-Or install it globally:
-
-```bash
-npm install --global dev-xcg
-```
-
-You can also add it as a development dependency:
-
-```bash
-npm install --save-dev dev-xcg
-```
-
 ## Usage
+
+No installation is required. `npx` runs the latest published version without installing it globally or adding it to your project's dependencies.
 
 Run the CLI from the root of the project where CRUD modules should be generated:
 
 ```bash
-dev-xcg blog-post
+npx dev-xcg blog-post
 ```
 
 This creates:
@@ -65,9 +47,9 @@ src/modules/blog-post/
 Display CLI help with:
 
 ```bash
-dev-xcg --help
+npx dev-xcg --help
 # or
-dev-xcg -h
+npx dev-xcg -h
 ```
 
 ## Generated Module
