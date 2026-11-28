@@ -1,6 +1,6 @@
 import { lstat, mkdir, open, rm, rmdir, stat } from "node:fs/promises";
 import type { Stats } from "node:fs";
-import { join, resolve } from "node:path";
+import { basename, join, resolve } from "node:path";
 
 import { parseResourceName } from "./naming.js";
 import type { ResourceName } from "./naming.js";
@@ -22,7 +22,9 @@ export type GenerationResult =
   | {
       readonly ok: true;
       readonly outputDirectory: string;
-      readonly files: readonly string[];
+      readonly directoryCreated: boolean;
+      readonly createdFiles: readonly string[];
+      readonly skippedFiles: readonly string[];
     }
   | {
       readonly ok: false;
@@ -35,6 +37,16 @@ interface GenerationPaths {
   readonly resourceDirectory: string;
   readonly files: readonly string[];
 }
+
+type PreflightResult =
+  | {
+      readonly ok: true;
+      readonly skippedFiles: readonly string[];
+    }
+  | {
+      readonly ok: false;
+      readonly message: string;
+    };
 
 function hasErrorCode(error: unknown, expectedCode: string): boolean {
   return (
@@ -112,30 +124,54 @@ async function createDirectory(directory: string): Promise<boolean> {
   }
 }
 
-async function preflight(paths: GenerationPaths): Promise<string | undefined> {
+async function preflight(paths: GenerationPaths): Promise<PreflightResult> {
   const srcStats = await statIfExists(paths.srcDirectory);
 
   if (srcStats !== undefined && !srcStats.isDirectory()) {
-    return `${paths.srcDirectory} exists and is not a directory.`;
+    return {
+      ok: false,
+      message: `${paths.srcDirectory} exists and is not a directory.`,
+    };
   }
 
   const modulesStats = await statIfExists(paths.modulesDirectory);
 
   if (modulesStats !== undefined && !modulesStats.isDirectory()) {
-    return `${paths.modulesDirectory} exists and is not a directory.`;
+    return {
+      ok: false,
+      message: `${paths.modulesDirectory} exists and is not a directory.`,
+    };
   }
 
-  if ((await lstatIfExists(paths.resourceDirectory)) !== undefined) {
-    return `Resource directory already exists: ${paths.resourceDirectory}. Refusing to overwrite.`;
+  const resourceStats = await lstatIfExists(paths.resourceDirectory);
+
+  if (resourceStats !== undefined && !resourceStats.isDirectory()) {
+    return {
+      ok: false,
+      message: `${paths.resourceDirectory} exists and is not a directory.`,
+    };
   }
+
+  const skippedFiles: string[] = [];
 
   for (const filePath of paths.files) {
-    if ((await lstatIfExists(filePath)) !== undefined) {
-      return `Refusing to overwrite existing file: ${filePath}`;
+    const fileStats = await lstatIfExists(filePath);
+
+    if (fileStats === undefined) {
+      continue;
     }
+
+    if (!fileStats.isFile()) {
+      return {
+        ok: false,
+        message: `Refusing to overwrite existing path: ${filePath}`,
+      };
+    }
+
+    skippedFiles.push(filePath);
   }
 
-  return undefined;
+  return { ok: true, skippedFiles };
 }
 
 async function cleanup(
@@ -187,14 +223,21 @@ export async function generateResource(
   };
   const createdDirectories: string[] = [];
   const createdFiles: string[] = [];
+  const createdFilenames: string[] = [];
+  let directoryCreated = false;
   const writeFileExclusive = options.fileWriter ?? writeExclusiveFile;
 
   try {
-    const conflict = await preflight(paths);
+    const preflightResult = await preflight(paths);
 
-    if (conflict !== undefined) {
-      return { ok: false, message: conflict };
+    if (!preflightResult.ok) {
+      return { ok: false, message: preflightResult.message };
     }
+
+    const skippedFilePaths = new Set(preflightResult.skippedFiles);
+    const skippedFilenames = preflightResult.skippedFiles.map((filePath) =>
+      basename(filePath),
+    );
 
     if (await createDirectory(paths.srcDirectory)) {
       createdDirectories.push(paths.srcDirectory);
@@ -204,35 +247,42 @@ export async function generateResource(
       createdDirectories.push(paths.modulesDirectory);
     }
 
-    if (!(await createDirectory(paths.resourceDirectory))) {
-      throw new Error(
-        `Resource directory already exists: ${paths.resourceDirectory}. Refusing to overwrite.`,
-      );
+    if (await createDirectory(paths.resourceDirectory)) {
+      createdDirectories.push(paths.resourceDirectory);
+      directoryCreated = true;
     }
-
-    createdDirectories.push(paths.resourceDirectory);
 
     for (const template of templates) {
       const filePath = join(paths.resourceDirectory, template.filename);
+
+      if (skippedFilePaths.has(filePath)) {
+        continue;
+      }
+
       options.onFileStart?.(template.filename);
 
       try {
         await writeFileExclusive(filePath, template.content);
       } catch (error) {
         if (hasErrorCode(error, "EEXIST")) {
-          throw new Error(`Refusing to overwrite existing file: ${filePath}`);
+          skippedFilePaths.add(filePath);
+          skippedFilenames.push(template.filename);
+          continue;
         }
 
         throw error;
       }
 
       createdFiles.push(filePath);
+      createdFilenames.push(template.filename);
     }
 
     return {
       ok: true,
       outputDirectory: paths.resourceDirectory,
-      files: templates.map((template) => template.filename),
+      directoryCreated,
+      createdFiles: createdFilenames,
+      skippedFiles: skippedFilenames,
     };
   } catch (error) {
     await cleanup(createdFiles, createdDirectories);

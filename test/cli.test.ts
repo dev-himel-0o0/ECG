@@ -1,7 +1,14 @@
 import { describe, it } from "node:test";
 import { deepEqual, equal, match } from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { mkdtemp, readdir, rm } from "node:fs/promises";
+import {
+  mkdir,
+  mkdtemp,
+  readFile,
+  readdir,
+  rm,
+  writeFile,
+} from "node:fs/promises";
 import { join } from "node:path";
 
 const cliPath = join(process.cwd(), "dist-test", "src", "index.js");
@@ -66,16 +73,58 @@ describe("dev-xcg CLI", () => {
     });
   });
 
-  it("exits non-zero and preserves files when the module already exists", async () => {
+  it("generates into an existing empty module directory", async () => {
+    await withTempRoot(async (projectRoot) => {
+      const resourceDirectory = join(projectRoot, "src", "modules", "user");
+      await mkdir(resourceDirectory, { recursive: true });
+
+      const result = runCli(projectRoot, ["user"]);
+
+      equal(result.status, 0);
+      match(result.stdout, /Using src\/modules\/user\//);
+      match(result.stdout, /✨ user module generated successfully!/);
+      deepEqual((await readdir(resourceDirectory)).sort(), expectedFiles);
+    });
+  });
+
+  it("creates missing files without overwriting existing generated files", async () => {
     await withTempRoot(async (projectRoot) => {
       const first = runCli(projectRoot, ["user"]);
       equal(first.status, 0);
 
+      const resourceDirectory = join(projectRoot, "src", "modules", "user");
+      const interfacePath = join(resourceDirectory, "user.interface.ts");
+      await writeFile(interfacePath, "existing interface\n", "utf8");
+      await rm(join(resourceDirectory, "user.service.ts"));
+
       const second = runCli(projectRoot, ["user"]);
-      equal(second.status, 1);
-      match(second.stderr, /resource directory already exists/i);
+      equal(second.status, 0);
+      match(second.stdout, /Using src\/modules\/user\//);
+      match(second.stdout, /Created user\.service\.ts/);
+      match(second.stdout, /Kept existing user\.interface\.ts/);
+      match(second.stdout, /✨ user module generated successfully!/);
+
+      equal(await readFile(interfacePath, "utf8"), "existing interface\n");
+      deepEqual((await readdir(resourceDirectory)).sort(), expectedFiles);
+    });
+  });
+
+  it("leaves a complete module unchanged", async () => {
+    await withTempRoot(async (projectRoot) => {
+      const first = runCli(projectRoot, ["user"]);
+      equal(first.status, 0);
 
       const resourceDirectory = join(projectRoot, "src", "modules", "user");
+      const interfacePath = join(resourceDirectory, "user.interface.ts");
+      await writeFile(interfacePath, "existing interface\n", "utf8");
+
+      const second = runCli(projectRoot, ["user"]);
+      equal(second.status, 0);
+      match(second.stdout, /Using src\/modules\/user\//);
+      match(second.stdout, /Kept existing user\.interface\.ts/);
+      match(second.stdout, /✨ user module is already complete!/);
+
+      equal(await readFile(interfacePath, "utf8"), "existing interface\n");
       deepEqual((await readdir(resourceDirectory)).sort(), expectedFiles);
     });
   });

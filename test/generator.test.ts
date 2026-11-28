@@ -49,7 +49,9 @@ describe("generateResource", () => {
 
       const expectedDirectory = join(projectRoot, "src", "modules", "user");
       equal(result.outputDirectory, expectedDirectory);
-      deepEqual([...result.files].sort(), expectedFiles);
+      equal(result.directoryCreated, true);
+      deepEqual([...result.createdFiles].sort(), expectedFiles);
+      deepEqual(result.skippedFiles, []);
 
       const entries = await readdir(expectedDirectory);
       deepEqual(entries.sort(), expectedFiles);
@@ -80,10 +82,51 @@ describe("generateResource", () => {
 
       equal(await readFile(join(modulesDirectory, "keep.txt"), "utf8"), "keep\n");
       deepEqual((await readdir(result.outputDirectory)).sort(), expectedFiles);
+      equal(result.directoryCreated, true);
+      deepEqual([...result.createdFiles].sort(), expectedFiles);
+      deepEqual(result.skippedFiles, []);
     });
   });
 
-  it("rejects an existing resource directory and preserves its files", async () => {
+  it("generates into an existing resource directory and preserves unrelated files", async () => {
+    await withTempRoot(async (projectRoot) => {
+      const resourceDirectory = join(projectRoot, "src", "modules", "user");
+      await mkdir(resourceDirectory, { recursive: true });
+      await writeFile(
+        join(resourceDirectory, "notes.txt"),
+        "existing notes\n",
+        "utf8",
+      );
+
+      const result = await generateResource({
+        projectRoot,
+        resource: "user",
+      });
+
+      equal(result.ok, true);
+      if (!result.ok) {
+        return;
+      }
+
+      deepEqual(
+        (await readdir(resourceDirectory)).sort(),
+        [...expectedFiles, "notes.txt"].sort(),
+      );
+      equal(result.directoryCreated, false);
+      deepEqual([...result.createdFiles].sort(), expectedFiles);
+      deepEqual(result.skippedFiles, []);
+      equal(
+        await readFile(join(resourceDirectory, "notes.txt"), "utf8"),
+        "existing notes\n",
+      );
+      equal(
+        await readFile(join(resourceDirectory, "user.interface.ts"), "utf8"),
+        "export interface IUser {}\n",
+      );
+    });
+  });
+
+  it("creates missing files and preserves existing generated files", async () => {
     await withTempRoot(async (projectRoot) => {
       const resourceDirectory = join(projectRoot, "src", "modules", "user");
       await mkdir(resourceDirectory, { recursive: true });
@@ -103,14 +146,20 @@ describe("generateResource", () => {
         resource: "user",
       });
 
-      equal(result.ok, false);
+      equal(result.ok, true);
       if (!result.ok) {
-        match(result.message, /resource directory already exists/i);
+        return;
       }
 
+      equal(result.directoryCreated, false);
+      deepEqual(
+        [...result.createdFiles].sort(),
+        expectedFiles.filter((filename) => filename !== "user.interface.ts"),
+      );
+      deepEqual(result.skippedFiles, ["user.interface.ts"]);
       deepEqual(
         (await readdir(resourceDirectory)).sort(),
-        ["notes.txt", "user.interface.ts"],
+        [...expectedFiles, "notes.txt"].sort(),
       );
       equal(
         await readFile(join(resourceDirectory, "user.interface.ts"), "utf8"),
@@ -120,6 +169,88 @@ describe("generateResource", () => {
         await readFile(join(resourceDirectory, "notes.txt"), "utf8"),
         "existing notes\n",
       );
+      match(
+        await readFile(join(resourceDirectory, "user.service.ts"), "utf8"),
+        /export const userService = \{/,
+      );
+    });
+  });
+
+  it("leaves a complete module unchanged", async () => {
+    await withTempRoot(async (projectRoot) => {
+      const resourceDirectory = join(projectRoot, "src", "modules", "user");
+      await mkdir(resourceDirectory, { recursive: true });
+
+      for (const filename of expectedFiles) {
+        await writeFile(
+          join(resourceDirectory, filename),
+          `existing ${filename}\n`,
+          "utf8",
+        );
+      }
+
+      const result = await generateResource({
+        projectRoot,
+        resource: "user",
+      });
+
+      equal(result.ok, true);
+      if (!result.ok) {
+        return;
+      }
+
+      equal(result.directoryCreated, false);
+      deepEqual(result.createdFiles, []);
+      deepEqual([...result.skippedFiles].sort(), expectedFiles);
+
+      for (const filename of expectedFiles) {
+        equal(
+          await readFile(join(resourceDirectory, filename), "utf8"),
+          `existing ${filename}\n`,
+        );
+      }
+    });
+  });
+
+  it("rejects a generated file path that is not a regular file", async () => {
+    await withTempRoot(async (projectRoot) => {
+      const resourceDirectory = join(projectRoot, "src", "modules", "user");
+      await mkdir(join(resourceDirectory, "user.interface.ts"), {
+        recursive: true,
+      });
+
+      const result = await generateResource({
+        projectRoot,
+        resource: "user",
+      });
+
+      equal(result.ok, false);
+      if (!result.ok) {
+        match(result.message, /refusing to overwrite existing path/i);
+      }
+
+      deepEqual(await readdir(resourceDirectory), ["user.interface.ts"]);
+    });
+  });
+
+  it("rejects a resource path that is not a directory", async () => {
+    await withTempRoot(async (projectRoot) => {
+      const modulesDirectory = join(projectRoot, "src", "modules");
+      await mkdir(modulesDirectory, { recursive: true });
+      const resourcePath = join(modulesDirectory, "user");
+      await writeFile(resourcePath, "not a directory\n", "utf8");
+
+      const result = await generateResource({
+        projectRoot,
+        resource: "user",
+      });
+
+      equal(result.ok, false);
+      if (!result.ok) {
+        match(result.message, /not a directory/i);
+      }
+
+      equal(await readFile(resourcePath, "utf8"), "not a directory\n");
     });
   });
 
@@ -165,6 +296,44 @@ describe("generateResource", () => {
       }
 
       deepEqual(await readdir(projectRoot), []);
+    });
+  });
+
+  it("preserves an existing resource directory when a write fails", async () => {
+    await withTempRoot(async (projectRoot) => {
+      const resourceDirectory = join(projectRoot, "src", "modules", "user");
+      await mkdir(resourceDirectory, { recursive: true });
+      await writeFile(
+        join(resourceDirectory, "notes.txt"),
+        "existing notes\n",
+        "utf8",
+      );
+      let writeCount = 0;
+
+      const result = await generateResource({
+        projectRoot,
+        resource: "user",
+        fileWriter: async (filePath, content) => {
+          writeCount += 1;
+
+          if (writeCount === 3) {
+            throw new Error("simulated write failure");
+          }
+
+          await writeFile(filePath, content, "utf8");
+        },
+      });
+
+      equal(result.ok, false);
+      if (!result.ok) {
+        match(result.message, /simulated write failure/);
+      }
+
+      deepEqual(await readdir(resourceDirectory), ["notes.txt"]);
+      equal(
+        await readFile(join(resourceDirectory, "notes.txt"), "utf8"),
+        "existing notes\n",
+      );
     });
   });
 

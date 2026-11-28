@@ -54,7 +54,9 @@ Validation order for a change is:
 1. `npm run typecheck`
 2. `npm test`
 3. `npm run build`
-4. `npm pack` when publishing behavior or package contents must be verified
+4. `npm pack`
+
+After packing, inspect the tarball and verify the packed CLI. See the Release Readiness Rule below.
 
 Run a single compiled test suite with:
 
@@ -94,12 +96,14 @@ Do not add filesystem path components from raw user input outside the validated 
 Generation must remain non-destructive and transactional:
 
 - Preflight the source, module, and resource paths
-- Reject an existing resource directory or file
+- Reuse an existing resource directory and create only missing generated files
+- Skip existing generated files without overwriting them
+- Reject a resource path that is not a directory or a generated-file path that is not a regular file
 - Never overwrite files
 - Use exclusive `wx` writes
 - Track created directories and files
 - Remove partial output when generation fails
-- Preserve the project directory on validation errors
+- Preserve pre-existing directories, unrelated files, and the project directory on validation errors
 
 Any change to this behavior must include regression coverage in `test/generator.test.ts` or `test/cli.test.ts`.
 
@@ -139,19 +143,35 @@ Document usage with `npx dev-xcg`. Do not recommend installing the package globa
 
 Publishing is manual. Do not add a publish step to CI without an explicit security and release process.
 
-Before publishing:
+### Release Readiness Rule
+
+After every change, verify the package and complete all pre-publish preparation, but do not publish:
+
+1. Run `npm run typecheck`.
+2. Run `npm test`.
+3. Run `npm run build`.
+4. Run `npm pack` and inspect the tarball contents.
+5. Verify the CLI from the packed artifact.
+6. Confirm `package.json`, `package-lock.json`, and the packed package report the same version.
+7. Report the verification results and any remaining manual release steps.
+
+Do not run `npm publish`, create or push release tags, or otherwise publish the package without explicit confirmation. Leave the release prepared and unpublished for the user to review. The user reviews and publishes after confirmation.
+
+### Before Publishing
+
+Before a release is considered ready:
 
 1. Start from a clean branch with the intended version committed in `package.json` and `package-lock.json`.
-2. Run `npm run typecheck`.
-3. Run `npm test`.
-4. Run `npm run build`.
-5. Run `npm pack` and inspect the tarball contents.
-6. Verify the CLI from the packed artifact if needed.
-7. Publish with `npm publish`.
-8. Create and push an annotated tag for the published version:
-   ```bash
-   git tag -a v<version> -m "dev-xcg <version>"
-   git push origin v<version>
-   ```
+2. Run the Release Readiness Rule checks above.
+3. Confirm the packed artifact contains only `dist`, `README.md`, `LICENSE`, and `package.json`.
+4. Confirm the packed CLI works.
+5. Stop and report readiness without publishing.
+
+After the user confirms and publishes, create and push an annotated tag for the published version:
+
+```bash
+git tag -a v<version> -m "dev-xcg <version>"
+git push origin v<version>
+```
 
 Do not document or implement `--dry-run` or automated publishing unless the release process is intentionally changed.

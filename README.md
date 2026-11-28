@@ -7,22 +7,6 @@
 [![npm version](https://img.shields.io/npm/v/dev-xcg.svg)](https://www.npmjs.com/package/dev-xcg)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-## Features
-
-- Generates five TypeScript files with matching names and imports
-- Generates typed Express controller, service, and repository objects
-- Uses relative Express router paths
-- Produces consistent CRUD naming and service/repository contracts
-- Validates resource names before writing files
-- Refuses to overwrite existing modules
-- Cleans up partial output when generation fails
-- Has no runtime dependencies
-
-## Requirements
-
-- Node.js 20 or newer
-- An Express + TypeScript project
-
 ## Usage
 
 No installation is required. `npx` runs the latest published version without installing it globally or adding it to your project's dependencies.
@@ -93,10 +77,29 @@ Names must also satisfy these constraints:
 
 `dev-xcg` is intentionally conservative:
 
-- A resource directory is created only after validation and preflight checks
-- Existing modules and files are never overwritten
+- A missing resource directory is created only after validation and preflight checks
+- An existing resource directory is reused, and only missing generated files are created
+- Existing generated files and unrelated files are never overwritten
+- Generated-file paths that are not regular files are rejected
 - Files are written exclusively with the `wx` flag
-- Directories and files created during a failed generation are removed
+- Directories and files created during a failed generation are removed, while pre-existing directories and files are preserved
+
+## Features
+
+- Generates five TypeScript files with matching names and imports
+- Generates typed Express controller, service, and repository objects
+- Uses relative Express router paths
+- Produces consistent CRUD naming and service/repository contracts
+- Validates resource names before writing files
+- Generates missing files in existing module directories
+- Never overwrites existing generated files
+- Cleans up partial output when generation fails
+- Has no runtime dependencies
+
+## Requirements
+
+- Node.js 20 or newer
+- An Express + TypeScript project
 
 ## Contributing
 

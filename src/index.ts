@@ -105,16 +105,33 @@ async function main(argv: readonly string[]): Promise<void> {
     `${filenamePrefix}.service.ts`,
     `${filenamePrefix}.repository.ts`,
   ];
+  const createdFiles = new Set(result.createdFiles);
+  const skippedFiles = new Set(result.skippedFiles);
 
   console.log(`✔ Resource name: ${parsed.resource}`);
-  console.log(`✔ Created ${outputDirectory}/`);
+  console.log(
+    `✔ ${result.directoryCreated ? "Created" : "Using"} ${outputDirectory}/`,
+  );
 
   for (const filename of orderedFiles) {
-    console.log(`✔ Created ${filename}`);
+    if (createdFiles.has(filename)) {
+      console.log(`✔ Created ${filename}`);
+    }
+  }
+
+  for (const filename of orderedFiles) {
+    if (skippedFiles.has(filename)) {
+      console.log(`✔ Kept existing ${filename}`);
+    }
   }
 
   console.log();
-  console.log(`✨ ${parsed.resource} module generated successfully!`);
+
+  if (result.createdFiles.length === 0) {
+    console.log(`✨ ${parsed.resource} module is already complete!`);
+  } else {
+    console.log(`✨ ${parsed.resource} module generated successfully!`);
+  }
 }
 
 try {
